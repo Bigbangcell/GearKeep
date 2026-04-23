@@ -1,0 +1,53 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.GearKeep" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primaryVariant</item>
+        <item name="colorOnPrimary">@color/onPrimary</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondaryVariant</item>
+        <item name="colorOnSecondary">@color/onSecondary</item>
+        <!-- Background color. -->
+        <item name="android:colorBackground" tools:targetApi="l">@color/background</item>
+        <item name="colorOnBackground">@color/onBackground</item>
+        <!-- Surface color. -->
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/onSurface</item>
+        <!-- Error color. -->
+        <item name="colorError">@color/error</item>
+        <item name="colorOnError">@color/onError</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/primary</item>
+        <!-- Navigation bar color. -->
+        <item name="android:navigationBarColor" tools:targetApi="l">@color/surface</item>
+        <!-- Typography. -->
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.GearKeep.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.GearKeep.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.GearKeep.HeadlineSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.GearKeep.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.GearKeep.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.GearKeep.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.GearKeep.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.GearKeep.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.GearKeep.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.GearKeep.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.GearKeep.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.GearKeep.LabelSmall</item>
+    </style>
+
+    <!-- Text appearances. -->
+    <style name="TextAppearance.GearKeep.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge" />
+    <style name="TextAppearance.GearKeep.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium" />
+    <style name="TextAppearance.GearKeep.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall" />
+    <style name="TextAppearance.GearKeep.TitleLarge" parent="TextAppearance.Material3.TitleLarge" />
+    <style name="TextAppearance.GearKeep.TitleMedium" parent="TextAppearance.Material3.TitleMedium" />
+    <style name="TextAppearance.GearKeep.TitleSmall" parent="TextAppearance.Material3.TitleSmall" />
+    <style name="TextAppearance.GearKeep.BodyLarge" parent="TextAppearance.Material3.BodyLarge" />
+    <style name="TextAppearance.GearKeep.BodyMedium" parent="TextAppearance.Material3.BodyMedium" />
+    <style name="TextAppearance.GearKeep.BodySmall" parent="TextAppearance.Material3.BodySmall" />
+    <style name="TextAppearance.GearKeep.LabelLarge" parent="TextAppearance.Material3.LabelLarge" />
+    <style name="TextAppearance.GearKeep.LabelMedium" parent="TextAppearance.Material3.LabelMedium" />
+    <style name="TextAppearance.GearKeep.LabelSmall" parent="TextAppearance.Material3.LabelSmall" />
+</resources>
