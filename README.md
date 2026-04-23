@@ -70,8 +70,8 @@ app/
 
 1. 克隆本仓库：
    ```bash
-   git clone https://github.com/yourusername/gearkeeper.git
-   cd gearkeeper
+   git clone https://github.com/Bigbangcell/GearKeep.git
+   cd GearKeep
    ```
 
 2. 使用 Android Studio 打开项目
@@ -113,8 +113,8 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 ## 联系我们
 
 如有问题或建议，请通过以下方式联系：
-- Email: support@gearkeeper.app
-- GitHub Issues: [提交问题](https://github.com/yourusername/gearkeeper/issues)
+- Email: bigbangcell@gmail.com
+- GitHub Issues: [提交问题](https://github.com/Bigbangcell/GearKeep/issues)
 
 ---
 
