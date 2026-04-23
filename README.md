@@ -1,7 +1,5 @@
 # GearKeep
 
-![GearKeep Logo](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=minimalist%20logo%20for%20GearKeep%20app%2C%20camera%20equipment%20management%2C%20clean%20design%2C%20blue%20and%20gray%20colors&image_size=square)
-
 ## 项目概述
 
 GearKeep 是一款专为摄影师和数码爱好者设计的纯本地、隐私安全的器材管理应用。
