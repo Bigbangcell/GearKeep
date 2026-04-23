@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GearKeep 网页端设计预览</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        @theme {
+            /* 浅色模式 */
+            --color-primary: #3b82f6;
+            --color-primary-foreground: #ffffff;
+            --color-secondary: #f3f4f6;
+            --color-secondary-foreground: #111827;
+            --color-accent: #10b981;
+            --color-accent-foreground: #ffffff;
+            --color-destructive: #ef4444;
+            --color-destructive-foreground: #ffffff;
+            --color-background: #ffffff;
+            --color-foreground: #111827;
+            --color-muted: #f3f4f6;
+            --color-muted-foreground: #6b7280;
+            --color-border: #e5e7eb;
+            --color-input: #f3f4f6;
+            --color-ring: #3b82f6;
+        }
+        
+        /* 深色模式 */
+        body.dark {
+            @theme {
+                --color-primary: #3b82f6;
+                --color-primary-foreground: #ffffff;
+                --color-secondary: #1f2937;
+                --color-secondary-foreground: #f3f4f6;
+                --color-accent: #10b981;
+                --color-accent-foreground: #0f172a;
+                --color-destructive: #ef4444;
+                --color-destructive-foreground: #ffffff;
+                --color-background: #0f172a;
+                --color-foreground: #f3f4f6;
+                --color-muted: #1e293b;
+                --color-muted-foreground: #94a3b8;
+                --color-border: #334155;
+                --color-input: #1e293b;
+                --color-ring: #3b82f6;
+            }
+            
+            background-color: var(--color-muted);
+            color: var(--color-foreground);
+        }
+        
+        body.dark .card {
+            @apply bg-background border-border;
+        }
+        
+        body.dark .badge-success {
+            @apply bg-green-900/30 text-green-400;
+        }
+        
+        body.dark .badge-warning {
+            @apply bg-yellow-900/30 text-yellow-400;
+        }
+        
+        body.dark .badge-danger {
+            @apply bg-red-900/30 text-red-400;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--color-muted);
+            color: var(--color-foreground);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .card {
+            @apply bg-background rounded-lg border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200;
+        }
+        
+        .btn {
+            @apply px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+        }
+        
+        .btn-primary {
+            @apply bg-primary text-primary-foreground hover:bg-primary/90;
+        }
+        
+        .btn-secondary {
+            @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+        }
+        
+        .btn-outline {
+            @apply border border-border hover:bg-secondary;
+        }
+        
+        .input {
+            @apply w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent;
+        }
+        
+        .badge {
+            @apply px-2 py-1 text-xs font-medium rounded-full;
+        }
+        
+        .badge-success {
+            @apply bg-green-100 text-green-800;
+        }
+        
+        .badge-warning {
+            @apply bg-yellow-100 text-yellow-800;
+        }
+        
+        .badge-danger {
+            @apply bg-red-100 text-red-800;
+        }
+        
+        /* 视图切换样式 */
+        .view-toggle {
+            @apply flex items-center space-x-1 border border-border rounded-md p-1 bg-secondary;
+        }
+        
+        .view-toggle button {
+            @apply px-3 py-1 rounded-md text-sm transition-colors;
+        }
+        
+        .view-toggle button.active {
+            @apply bg-primary text-primary-foreground;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .card {
+                @apply p-4;
+            }
+            
+            .grid-cols-3 {
+                @apply grid-cols-1;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .grid-cols-3 {
+                @apply grid-cols-2;
+            }
+        }
+    </style>
+</head>
+<body class="bg-muted min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-background border-b border-border sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fa fa-camera-retro text-primary text-2xl mr-2"></i>
+                        <span class="font-bold text-xl">GearKeep</span>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="#" class="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            首页
+                        </a>
+                        <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            器材库
+                        </a>
+                        <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            设置
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button class="btn btn-outline flex items-center" id="theme-toggle">
+                        <i class="fa fa-moon-o mr-2"></i>
+                        暗色模式
+                    </button>
+                    <button class="btn btn-primary flex items-center">
+                        <i class="fa fa-plus mr-2"></i>
+                        添加物品
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 统计卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-muted-foreground text-sm">总物品数</p>
+                        <h3 class="text-2xl font-bold mt-1">24</h3>
+                    </div>
+                    <div class="p-3 bg-blue-100 rounded-full">
+                        <i class="fa fa-cubes text-primary text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-muted-foreground text-sm">总资产价值</p>
+                        <h3 class="text-2xl font-bold mt-1">¥ 45,680</h3>
+                    </div>
+                    <div class="p-3 bg-green-100 rounded-full">
+                        <i class="fa fa-money text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-muted-foreground text-sm">保修中物品</p>
+                        <h3 class="text-2xl font-bold mt-1">18</h3>
+                    </div>
+                    <div class="p-3 bg-purple-100 rounded-full">
+                        <i class="fa fa-shield text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 保修看板 -->
+        <div class="card mb-8">
+            <h2 class="text-lg font-semibold mb-4">保修看板</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-border">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">物品</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">购买日期</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">保修截止</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">状态</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-background divide-y divide-border">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 rounded-md bg-gray-100 flex items-center justify-center mr-3">
+                                        <i class="fa fa-camera text-gray-500"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">Canon EOS R5</div>
+                                        <div class="text-sm text-muted-foreground">相机</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">2023-06-15</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">2024-06-15</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="badge badge-warning">即将到期</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 rounded-md bg-gray-100 flex items-center justify-center mr-3">
+                                        <i class="fa fa-video-camera text-gray-500"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">Sony A7 IV</div>
+                                        <div class="text-sm text-muted-foreground">相机</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">2023-08-20</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">2024-08-20</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="badge badge-success">保修中</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 最近添加 -->
+        <div class="card">
+            <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
+                <h2 class="text-lg font-semibold">最近添加</h2>
+                <div class="flex items-center space-x-3">
+                    <div class="view-toggle">
+                        <button class="active" title="卡片视图">
+                            <i class="fa fa-th"></i>
+                        </button>
+                        <button title="列表视图">
+                            <i class="fa fa-list"></i>
+                        </button>
+                    </div>
+                    <a href="#" class="text-primary text-sm hover:underline">查看全部</a>
+                </div>
+            </div>
+            <div id="items-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- 物品卡片将通过 JavaScript 动态生成 -->
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-background border-t border-border py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div class="text-sm text-muted-foreground">
+                    © 2026 GearKeep. 纯本地、隐私优先的器材管理工具。
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-muted-foreground hover:text-foreground">
+                        <i class="fa fa-github"></i>
+                    </a>
+                    <a href="#" class="text-muted-foreground hover:text-foreground">
+                        <i class="fa fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // 主题切换功能
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        // 检查用户偏好
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let isDark = prefersDark;
+        
+        // 初始化主题
+        updateTheme();
+        
+        themeToggle.addEventListener('click', () => {
+            isDark = !isDark;
+            updateTheme();
+        });
+        
+        function updateTheme() {
+            if (isDark) {
+                html.classList.add('dark');
+                themeToggle.innerHTML = '<i class="fa fa-sun-o mr-2"></i> 亮色模式';
+            } else {
+                html.classList.remove('dark');
+                themeToggle.innerHTML = '<i class="fa fa-moon-o mr-2"></i> 暗色模式';
+            }
+        }
+        
+        // 视图切换功能
+        const viewButtons = document.querySelectorAll('.view-toggle button');
+        const gridContainer = document.querySelector('.grid-cols-1');
+        const itemsContainer = document.getElementById('items-container');
+        
+        // 物品数据
+        const items = [
+            {
+                id: 1,
+                name: 'Canon EOS R5',
+                type: '相机',
+                price: '¥ 18,999',
+                status: '保修中',
+                statusClass: 'badge-success'
+            },
+            {
+                id: 2,
+                name: 'Sony A7 IV',
+                type: '相机',
+                price: '¥ 12,499',
+                status: '保修中',
+                statusClass: 'badge-success'
+            },
+            {
+                id: 3,
+                name: 'RF 24-70mm f/2.8',
+                type: '镜头',
+                price: '¥ 10,299',
+                status: '即将到期',
+                statusClass: 'badge-warning'
+            }
+        ];
+        
+        viewButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 移除所有按钮的 active 类
+                viewButtons.forEach(btn => btn.classList.remove('active'));
+                // 添加当前按钮的 active 类
+                button.classList.add('active');
+                
+                if (button.title === '列表视图') {
+                    // 切换到列表视图
+                    renderListView();
+                } else {
+                    // 切换到卡片视图
+                    renderCardView();
+                }
+            });
+        });
+        
+        function renderCardView() {
+            itemsContainer.innerHTML = items.map(item => `
+                <div class="card p-4">
+                    <div class="h-40 bg-gray-100 rounded-md mb-4 flex items-center justify-center">
+                        <i class="fa fa-camera text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="font-medium mb-1">${item.name}</h3>
+                    <p class="text-sm text-muted-foreground mb-2">${item.type}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium">${item.price}</span>
+                        <span class="badge ${item.statusClass}">${item.status}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderListView() {
+            itemsContainer.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-border">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">物品</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">类型</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">价格</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">状态</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-background divide-y divide-border">
+                            ${items.map(item => `
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-8 w-8 rounded-md bg-gray-100 flex items-center justify-center mr-3">
+                                                <i class="fa fa-camera text-gray-500"></i>
+                                            </div>
+                                            <div class="font-medium">${item.name}</div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">${item.type}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">${item.price}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="badge ${item.statusClass}">${item.status}</span>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        // 初始化渲染卡片视图
+        renderCardView();
+    </script>
+</body>
+</html>
