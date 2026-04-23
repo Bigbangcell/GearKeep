@@ -1,5 +1,11 @@
 # GearKeep
 
+🌐 **Language**
+- [English](README-en.md)
+- [中文 (Chinese)](README.md)
+
+
+
 ## Project Overview
 
 GearKeep is a privacy-focused, local-first equipment management app designed specifically for photographers and digital enthusiasts.

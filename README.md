@@ -1,5 +1,11 @@
 # GearKeep
 
+🌐 **语言/Language**
+- [中文 (Chinese)](README.md)
+- [English](README-en.md)
+
+
+
 ## 项目概述
 
 GearKeep 是一款专为摄影师和数码爱好者设计的纯本地、隐私安全的器材管理应用。
