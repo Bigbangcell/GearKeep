@@ -1,7 +1,24 @@
-import { getAllItems, addItem } from './indexeddb';
+import { getAllItems, addItem, getItem, updateItem } from './indexeddb';
 import { Item } from '../types';
 import * as XLSX from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
+
+export interface ImportResult {
+  success: boolean;
+  message: string;
+  itemsImported: number;
+  itemsSkipped: number;
+  itemsReplaced: number;
+  duplicates: Item[];
+}
+
+export interface ImportConflictInfo {
+  totalItems: number;
+  duplicates: Array<{
+    imported: Item;
+    existing: Item;
+  }>;
+}
 
 export async function exportData(): Promise<Blob> {
   const items = await getAllItems();
@@ -35,7 +52,42 @@ export async function importData(file: File): Promise<{ success: boolean; messag
   }
 }
 
-export async function importExcelData(file: File): Promise<{ success: boolean; message: string; itemsImported: number }> {
+export async function checkExcelImportDuplicates(file: File): Promise<ImportConflictInfo> {
+  const arrayBuffer = await file.arrayBuffer();
+  const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
+
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+  const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' }) as Record<string, unknown>[];
+
+  const now = Date.now();
+  const existingItems = await getAllItems();
+  const conflicts: Array<{ imported: Item; existing: Item }> = [];
+
+  for (const row of jsonData) {
+    const item = parseRowToItem(row, now);
+    if (!item) continue;
+
+    const existing = existingItems.find(e =>
+      (e.sn && item.sn && e.sn === item.sn) ||
+      (e.name === item.name && e.brand === item.brand && e.model === item.model)
+    );
+
+    if (existing) {
+      conflicts.push({ imported: item, existing });
+    }
+  }
+
+  return {
+    totalItems: jsonData.length,
+    duplicates: conflicts,
+  };
+}
+
+export async function importExcelData(
+  file: File,
+  mode: 'skip' | 'replace' | 'import-all' = 'skip'
+): Promise<ImportResult> {
   try {
     const arrayBuffer = await file.arrayBuffer();
     const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
@@ -46,6 +98,7 @@ export async function importExcelData(file: File): Promise<{ success: boolean; m
 
     const items: Item[] = [];
     const now = Date.now();
+    const existingItems = await getAllItems();
 
     for (const row of jsonData) {
       const item = parseRowToItem(row, now);
@@ -55,16 +108,66 @@ export async function importExcelData(file: File): Promise<{ success: boolean; m
     }
 
     if (items.length === 0) {
-      return { success: false, message: '未能从文件中识别出有效的物品数据', itemsImported: 0 };
+      return {
+        success: false,
+        message: '未能从文件中识别出有效的物品数据',
+        itemsImported: 0,
+        itemsSkipped: 0,
+        itemsReplaced: 0,
+        duplicates: [],
+      };
     }
+
+    let itemsImported = 0;
+    let itemsSkipped = 0;
+    let itemsReplaced = 0;
+    const duplicates: Item[] = [];
 
     for (const item of items) {
-      await addItem(item);
+      const existing = existingItems.find(e =>
+        (e.sn && item.sn && e.sn === item.sn) ||
+        (e.name === item.name && e.brand === item.brand && e.model === item.model)
+      );
+
+      if (existing) {
+        if (mode === 'skip') {
+          itemsSkipped++;
+          duplicates.push(existing);
+        } else if (mode === 'replace') {
+          await updateItem({ ...item, id: existing.id, createdAt: existing.createdAt, updatedAt: now });
+          itemsReplaced++;
+        } else {
+          await addItem(item);
+          itemsImported++;
+        }
+      } else {
+        await addItem(item);
+        itemsImported++;
+      }
     }
 
-    return { success: true, message: `成功从 Excel 导入 ${items.length} 个物品`, itemsImported: items.length };
+    const messages: string[] = [];
+    if (itemsImported > 0) messages.push(`新增 ${itemsImported} 个`);
+    if (itemsReplaced > 0) messages.push(`替换 ${itemsReplaced} 个`);
+    if (itemsSkipped > 0) messages.push(`跳过 ${itemsSkipped} 个重复`);
+
+    return {
+      success: true,
+      message: messages.join('，') || '导入完成',
+      itemsImported,
+      itemsSkipped,
+      itemsReplaced,
+      duplicates,
+    };
   } catch (error) {
-    return { success: false, message: 'Excel 导入失败：' + (error as Error).message, itemsImported: 0 };
+    return {
+      success: false,
+      message: 'Excel 导入失败：' + (error as Error).message,
+      itemsImported: 0,
+      itemsSkipped: 0,
+      itemsReplaced: 0,
+      duplicates: [],
+    };
   }
 }
 

@@ -54,8 +54,8 @@ export function ItemCard({ item }: ItemCardProps) {
           onMouseLeave={handleMouseLeave}
           className="card p-4 hover:shadow-lg transition-all duration-200 cursor-pointer border-border hover:border-primary/50"
         >
-          <div className="h-40 bg-muted rounded-md mb-4 flex items-center justify-center">
-            <i className="fa fa-camera text-4xl text-muted-foreground" />
+          <div className="h-24 bg-muted rounded-md mb-4 flex items-center justify-center">
+            <i className="fa fa-camera text-2xl text-muted-foreground" />
           </div>
           <h3 className="font-medium mb-1">{item.name}</h3>
           <p className="text-sm text-muted-foreground mb-2">{item.brand} {item.model}</p>

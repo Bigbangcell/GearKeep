@@ -69,6 +69,12 @@ export function Navbar() {
               <Link href="/inventory" className={getNavLinkClass('/inventory')}>
                 器材库
               </Link>
+              <Link href="/dashboard" className={getNavLinkClass('/dashboard')}>
+                看板
+              </Link>
+              <Link href="/management" className={getNavLinkClass('/management')}>
+                管理
+              </Link>
               <Link href="/settings" className={getNavLinkClass('/settings')}>
                 设置
               </Link>

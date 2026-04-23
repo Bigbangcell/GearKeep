@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { ItemCard } from '@/components/feature/ItemCard';
 import { SortableHeader } from '@/components/feature/SortableHeader';
 import { FieldSettings } from '@/components/feature/FieldSettings';
+import { ItemRow } from '@/components/feature/ItemRow';
 import { getAllItems, getSettings } from '@/lib/storage/indexeddb';
 import { Item } from '@/lib/types';
 import { sortItems, SortField, getNextSortOrder } from '@/lib/utils/pinyin';
@@ -20,22 +21,23 @@ export default function InventoryPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showFieldSettings, setShowFieldSettings] = useState(false);
 
+  const loadItems = async () => {
+    try {
+      const allItems = await getAllItems();
+      const settings = await getSettings();
+      setItems(allItems);
+      setFilteredItems(allItems);
+      setViewMode(settings.defaultView);
+      setSortField(settings.fieldSettings.listSortField as SortField);
+      setSortOrder(settings.fieldSettings.listSortOrder);
+    } catch (error) {
+      console.error('Failed to load items:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadItems = async () => {
-      try {
-        const allItems = await getAllItems();
-        const settings = await getSettings();
-        setItems(allItems);
-        setFilteredItems(allItems);
-        setViewMode(settings.defaultView);
-        setSortField(settings.fieldSettings.listSortField as SortField);
-        setSortOrder(settings.fieldSettings.listSortOrder);
-      } catch (error) {
-        console.error('Failed to load items:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadItems();
   }, []);
 
@@ -121,7 +123,10 @@ export default function InventoryPage() {
       <FieldSettings
         isOpen={showFieldSettings}
         onClose={() => setShowFieldSettings(false)}
-        onSave={() => {}}
+        onSave={() => {
+          // 重新加载设置
+          loadItems();
+        }}
       />
 
       {viewMode === 'card' ? (
@@ -151,11 +156,14 @@ export default function InventoryPage() {
                   />
                   <SortableHeader
                     field="brand"
-                    label="品牌型号"
+                    label="品牌"
                     currentSortField={sortField}
                     currentSortOrder={sortField === 'brand' ? sortOrder : null}
                     onSort={handleSort}
                   />
+                  <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    型号
+                  </th>
                   <SortableHeader
                     field="purchasePrice"
                     label="价格"
@@ -180,56 +188,9 @@ export default function InventoryPage() {
                 </tr>
               </thead>
               <tbody className="bg-background divide-y divide-border">
-                {sortedAndFilteredItems.map((item) => {
-                  const now = Date.now();
-                  const isExpiring = item.warrantyDeadline - now < 30 * 24 * 60 * 60 * 1000;
-                  const isExpired = item.warrantyDeadline < now;
-
-                  let statusBadge = (
-                    <span className="badge bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                      保修中
-                    </span>
-                  );
-
-                  if (isExpiring) {
-                    statusBadge = (
-                      <span className="badge bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                        即将到期
-                      </span>
-                    );
-                  } else if (isExpired) {
-                    statusBadge = (
-                      <span className="badge bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                        已过保
-                      </span>
-                    );
-                  }
-
-                  return (
-                    <tr key={item.id} className="hover:bg-muted/50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center mr-3">
-                            <i className="fa fa-camera text-muted-foreground" />
-                          </div>
-                          <div className="font-medium">{item.name}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                        {item.brand} {item.model}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        ¥ {item.purchasePrice.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                        {new Date(item.purchaseDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {statusBadge}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {sortedAndFilteredItems.map((item) => (
+                  <ItemRow key={item.id} item={item} />
+                ))}
                 {sortedAndFilteredItems.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
