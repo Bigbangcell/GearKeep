@@ -1,12 +1,18 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { Item } from '@/lib/types';
+import { ItemTooltip } from './ItemTooltip';
 
 interface ItemCardProps {
   item: Item;
 }
 
 export function ItemCard({ item }: ItemCardProps) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
   const now = Date.now();
   const isExpiring = item.warrantyDeadline - now < 30 * 24 * 60 * 60 * 1000;
   const isExpired = item.warrantyDeadline < now;
@@ -31,19 +37,41 @@ export function ItemCard({ item }: ItemCardProps) {
     );
   }
 
+  const handleMouseEnter = () => {
+    setShowTooltip(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
+
   return (
-    <Link href={`/item/${item.id}`} className="block">
-      <div className="card p-4 hover:shadow-md transition-shadow cursor-pointer">
-        <div className="h-40 bg-muted rounded-md mb-4 flex items-center justify-center">
-          <i className="fa fa-camera text-4xl text-muted-foreground" />
+    <div className="relative">
+      <Link href={`/item/${item.id}`} className="block">
+        <div
+          ref={cardRef}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          className="card p-4 hover:shadow-lg transition-all duration-200 cursor-pointer border-border hover:border-primary/50"
+        >
+          <div className="h-40 bg-muted rounded-md mb-4 flex items-center justify-center">
+            <i className="fa fa-camera text-4xl text-muted-foreground" />
+          </div>
+          <h3 className="font-medium mb-1">{item.name}</h3>
+          <p className="text-sm text-muted-foreground mb-2">{item.brand} {item.model}</p>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium">¥ {item.purchasePrice.toLocaleString()}</span>
+            {statusBadge}
+          </div>
         </div>
-        <h3 className="font-medium mb-1">{item.name}</h3>
-        <p className="text-sm text-muted-foreground mb-2">{item.brand} {item.model}</p>
-        <div className="flex justify-between items-center">
-          <span className="text-sm font-medium">¥ {item.purchasePrice.toLocaleString()}</span>
-          {statusBadge}
-        </div>
-      </div>
-    </Link>
+      </Link>
+
+      {showTooltip && cardRef.current && (
+        <ItemTooltip
+          item={item}
+          anchorRect={cardRef.current.getBoundingClientRect()}
+        />
+      )}
+    </div>
   );
 }

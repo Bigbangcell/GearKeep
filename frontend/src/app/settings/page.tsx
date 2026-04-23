@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { exportData, importData } from '@/lib/storage/import-export';
+import { exportData, importData, importExcelData } from '@/lib/storage/import-export';
 import { getSettings, updateSettings } from '@/lib/storage/indexeddb';
 
 export default function SettingsPage() {
@@ -43,7 +43,7 @@ export default function SettingsPage() {
     }
   };
 
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleJsonImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -53,6 +53,20 @@ export default function SettingsPage() {
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
       setMessage('导入失败：' + (error as Error).message);
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
+  const handleExcelImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const result = await importExcelData(file);
+      setMessage(result.message);
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      setMessage('Excel 导入失败：' + (error as Error).message);
       setTimeout(() => setMessage(null), 3000);
     }
   };
@@ -92,7 +106,7 @@ export default function SettingsPage() {
       <Card className="mb-6">
         <div className="p-6">
           <h2 className="text-lg font-semibold mb-4">数据管理</h2>
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
               <h3 className="text-sm font-medium mb-2">导出数据</h3>
               <p className="text-sm text-muted-foreground mb-3">
@@ -104,18 +118,38 @@ export default function SettingsPage() {
               </Button>
             </div>
             <div>
-              <h3 className="text-sm font-medium mb-2">导入数据</h3>
+              <h3 className="text-sm font-medium mb-2">导入 JSON 数据</h3>
               <p className="text-sm text-muted-foreground mb-3">
-                从 JSON 文件导入物品数据
+                从 GearKeep 导出的 JSON 文件导入
               </p>
-              <div className="flex space-x-3">
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleImport}
-                  className="flex-1"
-                />
-              </div>
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleJsonImport}
+                className="block w-full text-sm text-muted-foreground
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border file:border-border
+                  file:text-sm file:font-medium
+                  file:bg-secondary file:text-foreground
+                  hover:file:bg-muted"
+              />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium mb-2">从 Excel 导入</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                支持从 Excel 表格自动识别并导入物品数据（支持 .xlsx 和 .xls 格式）
+              </p>
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleExcelImport}
+                className="block w-full text-sm text-muted-foreground
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border file:border-border
+                  file:text-sm file:font-medium
+                  file:bg-secondary file:text-foreground
+                  hover:file:bg-muted"
+              />
             </div>
           </div>
         </div>

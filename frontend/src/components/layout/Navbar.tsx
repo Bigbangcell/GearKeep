@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { getSettings, updateSettings } from '@/lib/storage/indexeddb';
 
 export function Navbar() {
+  const pathname = usePathname();
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -37,6 +39,20 @@ export function Navbar() {
     }
   };
 
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return pathname === '/';
+    }
+    return pathname.startsWith(path);
+  };
+
+  const getNavLinkClass = (path: string) => {
+    if (isActive(path)) {
+      return 'border-primary text-foreground inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium';
+    }
+    return 'border-transparent text-muted-foreground hover:border-border hover:text-foreground inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium';
+  };
+
   return (
     <nav className="bg-background border-b border-border sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,22 +63,13 @@ export function Navbar() {
               <span className="font-bold text-xl">GearKeep</span>
             </div>
             <div className="hidden md:ml-6 md:flex md:space-x-8">
-              <Link
-                href="/"
-                className="border-primary text-foreground inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-              >
+              <Link href="/" className={getNavLinkClass('/')}>
                 首页
               </Link>
-              <Link
-                href="/inventory"
-                className="border-transparent text-muted-foreground hover:border-border hover:text-foreground inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-              >
+              <Link href="/inventory" className={getNavLinkClass('/inventory')}>
                 器材库
               </Link>
-              <Link
-                href="/settings"
-                className="border-transparent text-muted-foreground hover:border-border hover:text-foreground inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-              >
+              <Link href="/settings" className={getNavLinkClass('/settings')}>
                 设置
               </Link>
             </div>

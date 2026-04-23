@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import { Item, Relationship, Settings } from '../types';
+import { Item, Relationship, Settings, DEFAULT_VISIBLE_FIELDS, FieldSettings } from '../types';
 
 interface GearKeepDB extends DBSchema {
   items: {
@@ -89,13 +89,27 @@ export async function getSettings(): Promise<Settings> {
   const database = await getDB();
   const settings = await database.get('settings', 'app-settings');
   if (settings) {
-    const { key: _, ...rest } = settings;
-    return rest;
+    return settings;
   }
-  return { theme: 'light', defaultView: 'card' };
+  return {
+    theme: 'light',
+    defaultView: 'card',
+    fieldSettings: {
+      visibleFields: DEFAULT_VISIBLE_FIELDS,
+      fieldOrder: DEFAULT_VISIBLE_FIELDS,
+      listSortField: 'createdAt',
+      listSortOrder: 'desc',
+    }
+  };
 }
 
 export async function updateSettings(settings: Settings): Promise<void> {
   const database = await getDB();
   await database.put('settings', { ...settings, key: 'app-settings' });
+}
+
+export async function updateFieldSettings(fieldSettings: FieldSettings): Promise<void> {
+  const settings = await getSettings();
+  settings.fieldSettings = fieldSettings;
+  await updateSettings(settings);
 }

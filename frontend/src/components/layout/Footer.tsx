@@ -9,10 +9,10 @@ export function Footer() {
             © 2026 GearKeep. 纯本地、隐私优先的器材管理工具。
           </div>
           <div className="flex space-x-4">
-            <a href="#" className="text-muted-foreground hover:text-foreground">
+            <a href="https://github.com/Bigbangcell/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">
               <i className="fa fa-github" />
             </a>
-            <a href="#" className="text-muted-foreground hover:text-foreground">
+            <a href="mailto:bigbangcelllzz@gmail.com" className="text-muted-foreground hover:text-foreground">
               <i className="fa fa-envelope" />
             </a>
           </div>

@@ -1,11 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ItemCard } from '@/components/feature/ItemCard';
-import { getAllItems } from '@/lib/storage/indexeddb';
+import { SortableHeader } from '@/components/feature/SortableHeader';
+import { FieldSettings } from '@/components/feature/FieldSettings';
+import { getAllItems, getSettings } from '@/lib/storage/indexeddb';
 import { Item } from '@/lib/types';
+import { sortItems, SortField, getNextSortOrder } from '@/lib/utils/pinyin';
 
 export default function InventoryPage() {
   const [items, setItems] = useState<Item[]>([]);
@@ -13,13 +16,20 @@ export default function InventoryPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
   const [loading, setLoading] = useState(true);
+  const [sortField, setSortField] = useState<SortField>('createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [showFieldSettings, setShowFieldSettings] = useState(false);
 
   useEffect(() => {
     const loadItems = async () => {
       try {
         const allItems = await getAllItems();
+        const settings = await getSettings();
         setItems(allItems);
         setFilteredItems(allItems);
+        setViewMode(settings.defaultView);
+        setSortField(settings.fieldSettings.listSortField as SortField);
+        setSortOrder(settings.fieldSettings.listSortOrder);
       } catch (error) {
         console.error('Failed to load items:', error);
       } finally {
@@ -29,19 +39,29 @@ export default function InventoryPage() {
     loadItems();
   }, []);
 
-  useEffect(() => {
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(getNextSortOrder(sortOrder));
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const sortedAndFilteredItems = useMemo(() => {
+    let result = [...filteredItems];
+
     if (searchTerm) {
-      const filtered = items.filter(
+      result = result.filter(
         item =>
           item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.model.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setFilteredItems(filtered);
-    } else {
-      setFilteredItems(items);
     }
-  }, [searchTerm, items]);
+
+    return sortItems(result, sortField, sortOrder);
+  }, [filteredItems, searchTerm, sortField, sortOrder]);
 
   if (loading) {
     return (
@@ -68,6 +88,15 @@ export default function InventoryPage() {
             />
             <i className="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFieldSettings(true)}
+            className="rounded-md"
+          >
+            <i className="fa fa-cog mr-2" />
+            字段
+          </Button>
           <div className="flex items-center space-x-1 border border-border rounded-md p-1 bg-secondary">
             <Button
               variant={viewMode === 'card' ? 'default' : 'ghost'}
@@ -89,12 +118,18 @@ export default function InventoryPage() {
         </div>
       </div>
 
+      <FieldSettings
+        isOpen={showFieldSettings}
+        onClose={() => setShowFieldSettings(false)}
+        onSave={() => {}}
+      />
+
       {viewMode === 'card' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filteredItems.map((item) => (
+          {sortedAndFilteredItems.map((item) => (
             <ItemCard key={item.id} item={item} />
           ))}
-          {filteredItems.length === 0 && (
+          {sortedAndFilteredItems.length === 0 && (
             <div className="col-span-full text-center py-16 text-muted-foreground">
               <i className="fa fa-search text-4xl mb-4" />
               <p>没有找到匹配的物品</p>
@@ -107,25 +142,45 @@ export default function InventoryPage() {
             <table className="min-w-full divide-y divide-border">
               <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    物品
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    品牌型号
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    价格
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    购买日期
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    保修状态
-                  </th>
+                  <SortableHeader
+                    field="name"
+                    label="物品"
+                    currentSortField={sortField}
+                    currentSortOrder={sortField === 'name' ? sortOrder : null}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    field="brand"
+                    label="品牌型号"
+                    currentSortField={sortField}
+                    currentSortOrder={sortField === 'brand' ? sortOrder : null}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    field="purchasePrice"
+                    label="价格"
+                    currentSortField={sortField}
+                    currentSortOrder={sortField === 'purchasePrice' ? sortOrder : null}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    field="purchaseDate"
+                    label="购买日期"
+                    currentSortField={sortField}
+                    currentSortOrder={sortField === 'purchaseDate' ? sortOrder : null}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    field="warrantyDeadline"
+                    label="保修截止"
+                    currentSortField={sortField}
+                    currentSortOrder={sortField === 'warrantyDeadline' ? sortOrder : null}
+                    onSort={handleSort}
+                  />
                 </tr>
               </thead>
               <tbody className="bg-background divide-y divide-border">
-                {filteredItems.map((item) => {
+                {sortedAndFilteredItems.map((item) => {
                   const now = Date.now();
                   const isExpiring = item.warrantyDeadline - now < 30 * 24 * 60 * 60 * 1000;
                   const isExpired = item.warrantyDeadline < now;
@@ -151,7 +206,7 @@ export default function InventoryPage() {
                   }
 
                   return (
-                    <tr key={item.id}>
+                    <tr key={item.id} className="hover:bg-muted/50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center mr-3">
@@ -175,7 +230,7 @@ export default function InventoryPage() {
                     </tr>
                   );
                 })}
-                {filteredItems.length === 0 && (
+                {sortedAndFilteredItems.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
                       <i className="fa fa-search text-4xl mb-4" />

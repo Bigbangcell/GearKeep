@@ -21,13 +21,17 @@ export default function AddItemPage() {
     warrantyMonths: '',
     location: '',
     notes: '',
+    category: '',
+    purchaseChannel: '',
+    condition: '',
+    color: '',
     isMaster: false,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const target = e.target as HTMLInputElement;
     const { name, value, type } = target;
-    const checked = target.checked;
+    const checked = (target as HTMLInputElement).checked;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
@@ -53,6 +57,10 @@ export default function AddItemPage() {
       warrantyDeadline,
       location: formData.location,
       notes: formData.notes,
+      category: formData.category,
+      purchaseChannel: formData.purchaseChannel,
+      condition: formData.condition,
+      color: formData.color,
       isMaster: formData.isMaster,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -152,6 +160,74 @@ export default function AddItemPage() {
                 id="location"
                 name="location"
                 value={formData.location}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="category">分类</Label>
+              <select
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              >
+                <option value="">请选择分类</option>
+                <option value="相机">相机</option>
+                <option value="镜头">镜头</option>
+                <option value="配件">配件</option>
+                <option value="存储设备">存储设备</option>
+                <option value="灯光设备">灯光设备</option>
+                <option value="三脚架">三脚架</option>
+                <option value="包/箱">包/箱</option>
+                <option value="电池/充电器">电池/充电器</option>
+                <option value="滤镜">滤镜</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="purchaseChannel">购买渠道</Label>
+              <select
+                id="purchaseChannel"
+                name="purchaseChannel"
+                value={formData.purchaseChannel}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              >
+                <option value="">请选择渠道</option>
+                <option value="京东">京东</option>
+                <option value="天猫">天猫</option>
+                <option value="官网">官网</option>
+                <option value="拼多多">拼多多</option>
+                <option value="二手平台">二手平台</option>
+                <option value="线下门店">线下门店</option>
+                <option value="朋友转让">朋友转让</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="condition">成色</Label>
+              <select
+                id="condition"
+                name="condition"
+                value={formData.condition}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              >
+                <option value="">请选择成色</option>
+                <option value="全新">全新</option>
+                <option value="几乎全新">几乎全新</option>
+                <option value="轻微使用痕迹">轻微使用痕迹</option>
+                <option value="明显使用痕迹">明显使用痕迹</option>
+                <option value="翻新">翻新</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="color">颜色</Label>
+              <Input
+                id="color"
+                name="color"
+                value={formData.color}
                 onChange={handleChange}
               />
             </div>
